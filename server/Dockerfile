@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20-bullseye AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -6,7 +6,7 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-FROM node:20-alpine AS production
+FROM node:20-bullseye AS production
 WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
