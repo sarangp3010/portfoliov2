@@ -9,14 +9,14 @@ export const toggleFlag = async (req: Request, res: Response, next: NextFunction
   try {
     const { key } = req.params;
     const { enabled } = req.body;
-    const flag = await setFlag(key, Boolean(enabled));
+    const flag = await setFlag(key as string , Boolean(enabled));
     res.json({ success: true, data: flag });
   } catch (err) { next(err); }
 };
 
 export const patchFlag = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const flag = await updateFlag(req.params.key, req.body);
+    const flag = await updateFlag(req.params.key as string , req.body);
     res.json({ success: true, data: flag });
   } catch (err) { next(err); }
 };

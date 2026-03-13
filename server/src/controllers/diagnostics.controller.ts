@@ -38,7 +38,7 @@ export const activeVisitors = async (_req: Request, res: Response, next: NextFun
 export const sessionTimeline = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const session = await prisma.visitorSession.findUnique({
-      where: { id: req.params.sessionId },
+      where: { id: req.params.sessionId as string },
       include: {
         visitor: { select: { sessionId: true, country: true, city: true, browser: true, os: true, device: true, isMobile: true, referrer: true } },
         contentEvents: { orderBy: { createdAt: 'asc' } },
@@ -62,7 +62,7 @@ export const listSessions = async (req: Request, res: Response, next: NextFuncti
           visitor: { select: { country: true, browser: true, device: true, referrer: true } },
           _count: { select: { contentEvents: true } },
           // Fetch only key events for the list card (avoids loading all events)
-          highlights: {
+          contentEvents: {
             where: {
               eventType: {
                 in: [

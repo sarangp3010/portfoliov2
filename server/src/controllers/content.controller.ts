@@ -26,14 +26,14 @@ export const updateService = async (req: Request, res: Response, next: NextFunct
   try {
     const data = req.body;
     if (data.features && typeof data.features === 'string') data.features = data.features.split('\n').map((f: string) => f.trim()).filter(Boolean);
-    const s = await prisma.service.update({ where: { id: req.params.id }, data });
+    const s = await prisma.service.update({ where: { id: req.params.id as string }, data });
     res.json({ success: true, data: s });
   } catch (err) { next(err); }
 };
 
 export const deleteService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await prisma.service.delete({ where: { id: req.params.id } });
+    await prisma.service.delete({ where: { id: req.params.id as string } });
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { next(err); }
 };
@@ -55,14 +55,14 @@ export const createTestimonial = async (req: Request, res: Response, next: NextF
 
 export const updateTestimonial = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const t = await prisma.testimonial.update({ where: { id: req.params.id }, data: req.body });
+    const t = await prisma.testimonial.update({ where: { id: req.params.id as string  }, data: req.body });
     res.json({ success: true, data: t });
   } catch (err) { next(err); }
 };
 
 export const deleteTestimonial = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await prisma.testimonial.delete({ where: { id: req.params.id } });
+    await prisma.testimonial.delete({ where: { id: req.params.id as string  } });
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { next(err); }
 };
@@ -114,18 +114,18 @@ export const downloadResume = async (req: Request, res: Response, next: NextFunc
 export const setActiveResume = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     await prisma.resume.updateMany({ where: { isActive: true }, data: { isActive: false } });
-    const r = await prisma.resume.update({ where: { id: req.params.id }, data: { isActive: true } });
+    const r = await prisma.resume.update({ where: { id: req.params.id as string  }, data: { isActive: true } });
     res.json({ success: true, data: r });
   } catch (err) { next(err); }
 };
 
 export const deleteResume = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const r = await prisma.resume.findUnique({ where: { id: req.params.id } });
+    const r = await prisma.resume.findUnique({ where: { id: req.params.id as string  } });
     if (!r) throw new AppError('Not found', 404);
     const filePath = path.join(process.cwd(), r.fileUrl.replace('/uploads/', 'uploads/'));
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    await prisma.resume.delete({ where: { id: req.params.id } });
+    await prisma.resume.delete({ where: { id: req.params.id as string } });
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { next(err); }
 };
@@ -159,14 +159,14 @@ export const getInquiries = async (req: Request, res: Response, next: NextFuncti
 export const updateInquiryStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { status } = req.body;
-    const inq = await prisma.inquiry.update({ where: { id: req.params.id }, data: { status } });
+    const inq = await prisma.inquiry.update({ where: { id: req.params.id as string }, data: { status } });
     res.json({ success: true, data: inq });
   } catch (err) { next(err); }
 };
 
 export const deleteInquiry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await prisma.inquiry.delete({ where: { id: req.params.id } });
+    await prisma.inquiry.delete({ where: { id: req.params.id as string } });
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { next(err); }
 };

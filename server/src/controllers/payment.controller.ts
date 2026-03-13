@@ -56,7 +56,7 @@ export const stripeWebhook = async (req: Request, res: Response, next: NextFunct
 export const paymentStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { sessionId } = req.params;
-    const result = await getSessionStatus(sessionId);
+    const result = await getSessionStatus(sessionId as string );
     res.json({ success: true, data: result });
   } catch (err) { next(err); }
 };

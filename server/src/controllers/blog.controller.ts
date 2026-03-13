@@ -37,7 +37,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction):
 export const getPost = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const isAdmin = (req as any).user?.role === 'ADMIN';
-    const post = await prisma.blogPost.findFirst({ where: { slug: req.params.slug, ...(isAdmin ? {} : { published: true }) } });
+    const post = await prisma.blogPost.findFirst({ where: { slug: req.params.slug as string , ...(isAdmin ? {} : { published: true }) } });
     if (!post) { res.status(404).json({ success: false, error: 'Post not found' }); return; }
     prisma.blogPost.update({ where: { id: post.id }, data: { views: { increment: 1 } } }).catch(() => {});
     res.json({ success: true, data: post });
@@ -69,7 +69,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
 export const updatePost = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id } });
+    const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string } });
     if (existing) {
       await saveVersion('BLOG', existing.id, existing.title, { title: existing.title, content: existing.content, excerpt: existing.excerpt, tags: existing.tags, readingTime: existing.readingTime, slug: existing.slug }, (req as any).user?.id);
     }
@@ -77,7 +77,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     if (data.slug) data.slug = slugify(data.slug);
     if (data.tags && typeof data.tags === 'string') data.tags = data.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
     if (data.published && !data.publishedAt) data.publishedAt = new Date();
-    const post = await prisma.blogPost.update({ where: { id: req.params.id }, data });
+    const post = await prisma.blogPost.update({ where: { id: req.params.id as string }, data });
     await cacheDeletePattern('posts:');
     await cacheDeletePattern('blog:');
     res.json({ success: true, data: post });
@@ -86,7 +86,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 
 export const deletePost = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await prisma.blogPost.delete({ where: { id: req.params.id } });
+    await prisma.blogPost.delete({ where: { id: req.params.id as string } });
     await cacheDeletePattern('posts:');
     await cacheDeletePattern('blog:');
     res.json({ success: true });

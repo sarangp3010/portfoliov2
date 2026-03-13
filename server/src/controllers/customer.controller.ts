@@ -119,7 +119,7 @@ export const getReceipt = async (req: AuthRequest, res: Response, next: NextFunc
   try {
     const { paymentId } = req.params;
     const payment = await prisma.payment.findFirst({
-      where: { id: paymentId, customerEmail: req.user!.email },
+      where: { id: paymentId as string , customerEmail: req.user!.email },
     });
     if (!payment) throw new AppError('Payment not found', 404);
     res.json({
@@ -160,7 +160,7 @@ export const setupPaymentMethod = async (req: AuthRequest, res: Response, next: 
 export const deletePaymentMethod = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { detachPaymentMethod } = await import('../services/payment.service.js');
-    await detachPaymentMethod(req.params.pmId);
+    await detachPaymentMethod(req.params.pmId as string );
     res.json({ success: true });
   } catch (err) { next(err); }
 };
@@ -201,7 +201,7 @@ export const adminListCustomers = async (req: Request, res: Response, next: Next
 
 export const adminGetCustomer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const customer = await getCustomerDetail(req.params.id);
+    const customer = await getCustomerDetail(req.params.id as string );
     if (!customer) throw new AppError('Customer not found', 404);
     res.json({ success: true, data: customer });
   } catch (err) { next(err); }
@@ -210,7 +210,7 @@ export const adminGetCustomer = async (req: Request, res: Response, next: NextFu
 export const adminToggleCustomer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { isActive } = req.body;
-    const customer = await setCustomerActive(req.params.id, Boolean(isActive));
+    const customer = await setCustomerActive(req.params.id as string , Boolean(isActive));
     res.json({ success: true, data: customer });
   } catch (err) { next(err); }
 };
@@ -224,7 +224,7 @@ export const adminListSessions = async (_req: Request, res: Response, next: Next
 
 export const adminTerminateSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await terminateSession(req.params.sessionId);
+    await terminateSession(req.params.sessionId as string );
     res.json({ success: true });
   } catch (err) { next(err); }
 };
@@ -243,7 +243,7 @@ export const adminReplyMessage = async (req: Request, res: Response, next: NextF
   try {
     const { reply } = req.body;
     const msg = await prisma.customerMessage.update({
-      where: { id: req.params.msgId },
+      where: { id: req.params.msgId as string  },
       data: { adminReply: reply, status: 'REPLIED' },
       include: { customer: { select: { email: true, name: true } } },
     });
@@ -251,9 +251,9 @@ export const adminReplyMessage = async (req: Request, res: Response, next: NextF
     // Email reply to customer
     try {
       await emailService.sendEmail({
-        to: msg.customer.email,
+        to: msg?.customer?.email,
         subject: 'Response to your message',
-        html: `<p>Hi ${msg.customer.name},</p><p>${reply}</p>`,
+        html: `<p>Hi ${msg?.customer?.name},</p><p>${reply}</p>`,
       });
     } catch {}
 

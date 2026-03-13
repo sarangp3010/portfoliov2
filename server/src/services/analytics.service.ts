@@ -1,5 +1,6 @@
 import { UAParser } from 'ua-parser-js';
 import { prisma } from '../config/prisma.js';
+import { Prisma } from "@prisma/client";
 import { EventType, ContentEventType, ContentType } from '@prisma/client';
 import { logger } from '../utils/logger.js';
 
@@ -129,7 +130,7 @@ export const recordEvent = async (
   type: EventType,
   page?: string,
   target?: string,
-  metadata?: Record<string, unknown>,
+  metadata?: Prisma.InputJsonValue,
 ) => {
   return prisma.analyticsEvent.create({ data: { visitorId, type, page, target, metadata } });
 };
@@ -161,7 +162,7 @@ export const recordContentEvent = async (payload: {
       contentType: payload.contentType ?? 'OTHER',
       contentId: payload.contentId,
       contentTitle: payload.contentTitle,
-      metadata: payload.metadata,
+      metadata: payload.metadata as Prisma.InputJsonValue,
     },
   });
 };
